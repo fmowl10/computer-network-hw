@@ -3,7 +3,7 @@ implement http server &amp; client with raw socket
 
 
 
-## dependecies
+## dependencies
 
 ### Build
 
