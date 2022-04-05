@@ -43,7 +43,11 @@ int helloGet(const Request *req, Response *res)
     return 0;
 }
 
-const char *rootBody =
+/**
+ * @brief hard coded /index.html
+ *
+ */
+const char *rootBody = {
     "<!DOCTYPE html>\n"
     "<html>\n"
     "<head>\n"
@@ -52,13 +56,14 @@ const char *rootBody =
     "<body>\n"
     "<h1>hello</h1>\n"
     "</body>\n"
-    "</html>\n";
+    "</html>\n"};
 
 int root(const Request *req, Response *res)
 {
     res->code = OK;
     res->protocol = HTTP1;
 
+    // if method is get than add a body
     if (req->method == GET)
     {
         res->body = rootBody;
@@ -79,6 +84,7 @@ int root(const Request *req, Response *res)
 
 int main(int argc, char **argv)
 {
+    // if user doesn't pass port number than terminate.
     if (argc != 2)
     {
         printf("pass port number ./server [portnumber]");
@@ -87,6 +93,7 @@ int main(int argc, char **argv)
 
     int portNumber = atoi(argv[1]);
 
+    // if portNumber can not parse or not a proper port number than terminate.
     if (portNumber == 0 || (portNumber > UINT16_MAX))
     {
         printf("pass right port number");
@@ -102,7 +109,7 @@ int main(int argc, char **argv)
     addRoute(server, "/hello", GET, helloGet);
     addRoute(server, "/hello", HEAD, helloGet);
 
-    // /
+    // /(root)
     addRoute(server, "/", GET, root);
     addRoute(server, "/", HEAD, root);
 

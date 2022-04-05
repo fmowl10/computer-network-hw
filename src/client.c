@@ -1,3 +1,13 @@
+/**
+ * @file client.c
+ * @author Jinseok Kim (jinseok1001@hotmail.com)
+ * @brief http client
+ * @version 0.1
+ * @date 2022-03-31
+ *
+ * @copyright Copyright (c) 2022
+ *
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
