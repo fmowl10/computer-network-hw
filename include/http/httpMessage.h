@@ -13,6 +13,10 @@
 
 #include <stdlib.h>
 
+/**
+ * @brief set number of supported method
+ *
+ */
 #define NUMSUPPORTEDMETHOD 5
 
 /**
@@ -58,7 +62,11 @@ const char *StatusCodePhrase[] = {"OK", "Bad Request", "Not Found", NULL};
  */
 const char *StatusCodeRaw[] = {"200", "400", "404", NULL};
 
-const char *HTTP1 = "HTTP1";
+/**
+ * @brief http1 raw string
+ *
+ */
+const char *HTTP1 = "HTTP/1.0";
 
 /**
  * @brief HeaderNode
@@ -69,9 +77,24 @@ typedef struct _HeaderNode
     const char *key;
     const char *value;
     struct _HeaderNode *next;
-} HeaderNode; // add addHeaderNode
+} HeaderNode;
 
+/**
+ * @brief allocate new HeaderNode
+ *
+ * @param key
+ * @param value
+ * @return HeaderNode*
+ */
 HeaderNode *newHeaderNode(const char *key, const char *value);
+
+/**
+ * @brief Add child to end of parent
+ *
+ * @param parent
+ * @param child
+ * @return int
+ */
 int addHeaderNode(HeaderNode *parent, HeaderNode *child);
 
 /**
@@ -88,6 +111,24 @@ typedef struct _request
 } Request;
 
 /**
+ * @brief parse raw requset string to Request
+ *
+ * @param rawRequest in
+ * @param request  out
+ * @return int  error status
+ */
+int requestParse(const char *rawRequest, Request *request);
+
+/**
+ * @brief stringfy request struct to raw string
+ *
+ * @param request in
+ * @param destStr out
+ * @return int  error status
+ */
+int requestStringfy(const Request *request, const char *destStr);
+
+/**
  * @brief response struct
  *
  */
@@ -99,10 +140,22 @@ typedef struct _response
     const char *body;
 } Response;
 
-int requestParse(const char *rawRequest, Request *request);
-int requestStringfy(const Request *request, const char *destStr);
-
+/**
+ * @brief parse raw reponse string to Response
+ *
+ * @param rawResponse in
+ * @param response out
+ * @return int error status
+ */
 int responseParse(const char *rawResponse, Response *response);
+
+/**
+ * @brief stringfy struct response to raw string
+ *
+ * @param response in
+ * @param destStr out
+ * @return int error status
+ */
 int responseStringfy(const Response *response, const char *destStr);
 
 #endif
