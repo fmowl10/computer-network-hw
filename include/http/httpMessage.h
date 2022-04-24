@@ -11,13 +11,33 @@
 #ifndef __HTTPMESSAGE_H__
 #define __HTTPMESSAGE_H__
 
+#include <stdbool.h>
 #include <stdlib.h>
+
+/**
+ * @brief errorno
+ *
+ */
+
+typedef enum _parseerrorno
+{
+    ParseError_NONE = 0,
+    ParseError,
+    Stringfyerror,
+    ReadMore,
+} ParseErrorno;
+
+typedef enum _stringfyerrorno
+{
+    StringfyError_NONE = 0,
+    TOO_SHORT,
+} StringfyErrorno;
 
 /**
  * @brief set number of supported method
  *
  */
-#define NUMSUPPORTEDMETHOD 5
+#define NUMSUPPORTEDMETHOD 4
 
 /**
  * @brief Request method enum
@@ -29,14 +49,18 @@ typedef enum _method
     HEAD,
     POST,
     PUT,
-    METHOD_NONE
+    Method_NONE
 } Method;
+
+Method parseMethod(const char *rawMethod);
 
 /**
  * @brief method raw string
  *
  */
-const char *MethodRaw[] = {"GET", "HEAD", "POST", "PUT", NULL};
+const char *RawMethods[NUMSUPPORTEDMETHOD] = {"GET", "HEAD", "POST", "PUT"};
+
+#define NUMSUPPORTEDSTATUS 3
 
 /**
  * @brief status Code enum
@@ -47,26 +71,32 @@ typedef enum _StatusCode
     OK,
     BadRequest,
     NotFound,
-    STATUSCODE_NONE
+    StatusCode_NONE
 } StatusCode;
 
 /**
  * @brief  status code enum to phrase
  *
  */
-const char *StatusCodePhrase[] = {"OK", "Bad Request", "Not Found", NULL};
+const char *StatusCodeMessages[NUMSUPPORTEDSTATUS] = {"OK", "Bad Request", "Not Found"};
 
 /**
  * @brief status code enum to raw string
  *
  */
-const char *StatusCodeRaw[] = {"200", "400", "404", NULL};
+const int RawStatusCodes[NUMSUPPORTEDSTATUS] = {200, 400, 404};
+
+StatusCode parseStatusCode(int rawCode, const char *message);
+
+#define NUMSUPPORTEDPROTOCOL 1
 
 /**
- * @brief http1 raw string
+ * @brief https raw string
  *
  */
-const char *HTTP1 = "HTTP/1.0";
+const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL] = {"HTTP/1.0"};
+
+bool isProtocolVersionValid(const char *rawProtocol);
 
 /**
  * @brief HeaderNode
@@ -74,8 +104,8 @@ const char *HTTP1 = "HTTP/1.0";
  */
 typedef struct _HeaderNode
 {
-    const char *key;
-    const char *value;
+    char *key;
+    char *value;
     struct _HeaderNode *next;
 } HeaderNode;
 
@@ -89,13 +119,33 @@ typedef struct _HeaderNode
 HeaderNode *newHeaderNode(const char *key, const char *value);
 
 /**
+ * @brief free header list
+ *
+ * @param parent
+ */
+void freeHeaderList(HeaderNode **parent);
+
+/**
  * @brief Add child to end of parent
  *
  * @param parent
  * @param child
  * @return int
  */
-int addHeaderNode(HeaderNode *parent, HeaderNode *child);
+int addHeaderNode(HeaderNode **parent, HeaderNode *child);
+
+/**
+ * @brief search Header Node by Key
+ *
+ * @param root
+ * @param key
+ * @return const char* Null if header not find.
+ */
+const char *getHeaderNodeItem(HeaderNode *root, const char *key);
+
+ParseErrorno parseHeaderNode(char **rawHeader, HeaderNode **hn);
+
+StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz);
 
 /**
  * @brief request struct
@@ -104,11 +154,18 @@ int addHeaderNode(HeaderNode *parent, HeaderNode *child);
 typedef struct _request
 {
     Method method;
-    const char *URI;
-    const char *protocol;
-    const char *body;
+    char *URI;
+    char *protocol;
+    char *body;
     HeaderNode *header;
 } Request;
+
+/**
+ * @brief init new request
+ *
+ * @return Request*
+ */
+Request *newRequest();
 
 /**
  * @brief parse raw requset string to Request
@@ -117,7 +174,7 @@ typedef struct _request
  * @param request  out
  * @return int  error status
  */
-int requestParse(const char *rawRequest, Request *request);
+ParseErrorno parseRequest(char *rawRequest, Request *request);
 
 /**
  * @brief stringfy request struct to raw string
@@ -126,7 +183,8 @@ int requestParse(const char *rawRequest, Request *request);
  * @param destStr out
  * @return int  error status
  */
-int requestStringfy(const Request *request, const char *destStr);
+
+StringfyErrorno stringfyRequest(const Request *request, char *destStr, size_t sz);
 
 /**
  * @brief response struct
@@ -134,11 +192,18 @@ int requestStringfy(const Request *request, const char *destStr);
  */
 typedef struct _response
 {
-    const char *protocol;
+    char *protocol;
     StatusCode code;
     HeaderNode *header;
-    const char *body;
+    char *body;
 } Response;
+
+/**
+ * @brief init new response
+ *
+ * @return Response*
+ */
+Response *newResponse();
 
 /**
  * @brief parse raw reponse string to Response
@@ -147,7 +212,7 @@ typedef struct _response
  * @param response out
  * @return int error status
  */
-int responseParse(const char *rawResponse, Response *response);
+ParseErrorno parseResponse(char *rawResponse, Response *response);
 
 /**
  * @brief stringfy struct response to raw string
@@ -156,6 +221,6 @@ int responseParse(const char *rawResponse, Response *response);
  * @param destStr out
  * @return int error status
  */
-int responseStringfy(const Response *response, const char *destStr);
+StringfyErrorno stringfyResponse(const Response *response, char *destStr, size_t sz);
 
 #endif
