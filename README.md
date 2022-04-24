@@ -18,6 +18,7 @@ implement http server &amp; client with raw socket
 * python3
 * curl
 * wget
+* cmake
 
 ## Building The server &amp; client
 
