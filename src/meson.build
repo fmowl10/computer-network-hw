@@ -1,3 +1,3 @@
-client_source = file('client.c')
-server_source = file('server.c')
+client_source = files('client.c')
+server_source = files('server.c')
 subdir('http')
