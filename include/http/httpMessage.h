@@ -58,7 +58,7 @@ Method parseMethod(const char *rawMethod);
  * @brief method raw string
  *
  */
-const char *RawMethods[NUMSUPPORTEDMETHOD] = {"GET", "HEAD", "POST", "PUT"};
+extern const char *RawMethods[NUMSUPPORTEDMETHOD];
 
 #define NUMSUPPORTEDSTATUS 3
 
@@ -78,13 +78,13 @@ typedef enum _StatusCode
  * @brief  status code enum to phrase
  *
  */
-const char *StatusCodeMessages[NUMSUPPORTEDSTATUS] = {"OK", "Bad Request", "Not Found"};
+extern const char *StatusCodeMessages[NUMSUPPORTEDSTATUS];
 
 /**
  * @brief status code enum to raw string
  *
  */
-const int RawStatusCodes[NUMSUPPORTEDSTATUS] = {200, 400, 404};
+extern const int RawStatusCodes[NUMSUPPORTEDSTATUS];
 
 StatusCode parseStatusCode(int rawCode, const char *message);
 
@@ -94,7 +94,7 @@ StatusCode parseStatusCode(int rawCode, const char *message);
  * @brief https raw string
  *
  */
-const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL] = {"HTTP/1.0"};
+extern const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL];
 
 bool isProtocolVersionValid(const char *rawProtocol);
 

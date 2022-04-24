@@ -5,6 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+const char *RawMethods[NUMSUPPORTEDMETHOD] = {"GET", "HEAD", "POST", "PUT"};
+
+const char *StatusCodeMessages[NUMSUPPORTEDSTATUS] = {"OK", "Bad Request", "Not Found"};
+
+const int RawStatusCodes[NUMSUPPORTEDSTATUS] = {200, 400, 404};
+
+const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL] = {"HTTP/1.0"};
+
 Method parseMethod(const char *rawMethod)
 {
     for (int i = 0; i < NUMSUPPORTEDMETHOD; i++)
