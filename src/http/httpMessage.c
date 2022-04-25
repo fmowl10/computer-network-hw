@@ -1,9 +1,20 @@
-#include <http/httpMessage.h>
+/**
+ * @file httpMessage.c
+ * @author Jinseok Kim (jinseok1001@hotmail.com)
+ * @brief http Message parser & stringfy
+ * @version 0.1
+ * @date 2022-04-25
+ *
+ * @copyright Copyright (c) 2022, Jinseok KIm
+ *
+ */
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <http/httpMessage.h>
 
 const char *RawMethods[NUMSUPPORTEDMETHOD] = {"GET", "HEAD", "POST", "PUT"};
 

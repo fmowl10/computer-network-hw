@@ -5,9 +5,10 @@
  * @version 0.0.1
  * @date 2022-03-31
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2022, Jinseok Kim
  *
  */
+
 #ifndef __HTTPSERVER_H__
 #define __HTTPSERVER_H__
 

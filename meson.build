@@ -11,3 +11,5 @@ subdir('test')
 
 executable('client', client_source, dependencies:httpMessage_dep)
 # executable('server', server_source, declare_dependency:[httpMessage_dep, httpServer_dep])
+
+subdir('docs')

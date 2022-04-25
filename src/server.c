@@ -5,16 +5,17 @@
  * @version 0.0.1
  * @date 2022-03-30
  *
- * @copyright Copyright (c) 2022
+ * @copyright Copyright (c) 2022, Jinsoek Kim
  *
  */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "http/httpMessage.h"
-#include "http/httpServer.h"
+#include <http/httpMessage.h>
+#include <http/httpServer.h>
 
 const char *helloGetBody = "body";
 
@@ -25,7 +26,7 @@ const char *helloGetBody = "body";
 int helloGet(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = HTTP1;
+    res->protocol = ProtocolVersions[0];
 
     if (req->method == GET)
         res->body = helloGetBody;
@@ -61,7 +62,7 @@ const char *rootBody = {
 int root(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = HTTP1;
+    res->protocol = ProtocolVersions[0];
 
     // if method is get than add a body
     if (req->method == GET)

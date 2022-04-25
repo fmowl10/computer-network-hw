@@ -67,7 +67,7 @@ static void run_test(UnityTestFunction func, const char *name, UNITY_LINE_TYPE l
 /*=======MAIN=====*/
 int main(void)
 {
-  UnityBegin("tests/TestHttpMessage.c");
+  UnityBegin("test/TestHttpMessage.c");
   run_test(test_newRequest, "test_newRequest", 8);
 
   return UnityEnd();
