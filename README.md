@@ -19,6 +19,7 @@ implement http server &amp; client with raw socket
 * curl
 * wget
 * cmake
+* pdflatex
 
 ## Building The server &amp; client
 
@@ -74,3 +75,5 @@ meson test -C build
 * meson sample project https://github.com/tiernemi/meson-sample-project
 
 * unit test (unity) https://github.com/ThrowTheSwitch/Unity/tree/master/examples/example_4
+
+* doxygen meson configuration https://gitlab.freedesktop.org/libinput/libinput/blob/a52f0db3c54b093a2c44dce37ea6dd5582a19c5a/doc/api/meson.build
