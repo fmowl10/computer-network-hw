@@ -20,7 +20,7 @@
  *
  */
 
-typedef enum _parseerrorno
+typedef enum
 {
     ParseError_NONE = 0,
     ParseError,
@@ -28,7 +28,7 @@ typedef enum _parseerrorno
     ReadMore,
 } ParseErrorno;
 
-typedef enum _stringfyerrorno
+typedef enum
 {
     StringfyError_NONE = 0,
     TOO_SHORT,
@@ -44,7 +44,7 @@ typedef enum _stringfyerrorno
  * @brief Request method enum
  *
  */
-typedef enum _method
+typedef enum
 {
     GET,
     HEAD,
@@ -67,7 +67,7 @@ extern const char *RawMethods[NUMSUPPORTEDMETHOD];
  * @brief status Code enum
  *
  */
-typedef enum _StatusCode
+typedef enum
 {
     OK,
     BadRequest,
@@ -103,11 +103,11 @@ bool isProtocolVersionValid(const char *rawProtocol);
  * @brief HeaderNode
  *
  */
-typedef struct _HeaderNode
+typedef struct HeaderNode
 {
     char *key;
     char *value;
-    struct _HeaderNode *next;
+    struct HeaderNode *next;
 } HeaderNode;
 
 /**
@@ -152,7 +152,7 @@ StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz);
  * @brief request struct
  *
  */
-typedef struct _request
+typedef struct
 {
     Method method;
     char *URI;
@@ -191,7 +191,7 @@ StringfyErrorno stringfyRequest(const Request *request, char *destStr, size_t sz
  * @brief response struct
  *
  */
-typedef struct _response
+typedef struct
 {
     char *protocol;
     StatusCode code;

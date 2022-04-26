@@ -31,6 +31,7 @@ Method parseMethod(const char *rawMethod)
         if (strcmp(RawMethods[i], rawMethod) == 0)
             return (Method)i;
     }
+
     return Method_NONE;
 }
 
@@ -43,6 +44,7 @@ StatusCode parseStatusCode(int rawCode, const char *message)
             return (StatusCode)i;
         }
     }
+
     return StatusCode_NONE;
 }
 
@@ -54,6 +56,7 @@ bool isProtocolVersionValid(const char *rawProtocol)
         if (strcmp(ProtocolVersions[i], rawProtocol) == 0)
             return true;
     }
+
     return false;
 }
 
@@ -63,6 +66,7 @@ HeaderNode *newHeaderNode(const char *key, const char *value)
     temp->next = NULL;
     temp->key = strdup(key);
     temp->value = strdup(value);
+
     return temp;
 }
 
@@ -94,6 +98,7 @@ int addHeaderNode(HeaderNode **parent, HeaderNode *child)
         cur = cur->next;
     }
     cur->next = child;
+
     return 0;
 }
 
@@ -106,6 +111,7 @@ const char *getHeaderNodeItem(HeaderNode *root, const char *key)
             return cur->value;
         cur = cur->next;
     }
+
     return NULL;
 }
 
@@ -133,6 +139,7 @@ ParseErrorno parseHeaderNode(char **rawHeader, HeaderNode **hn)
 
         line = strtok(NULL, "\r\n");
     }
+
     return ParseError_NONE;
 }
 
@@ -152,6 +159,7 @@ StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz)
         strcat(destStr, cur->value);
         strcat(destStr, "\r\n");
     }
+
     return StringfyError_NONE;
 }
 
@@ -163,6 +171,7 @@ Request *newRequest()
     temp->protocol = NULL;
     temp->body = NULL;
     temp->header = NULL;
+
     return temp;
 }
 
@@ -246,6 +255,7 @@ Response *newResponse()
     temp->code = StatusCode_NONE;
     temp->header = NULL;
     temp->body = NULL;
+
     return temp;
 }
 
@@ -286,6 +296,7 @@ ParseErrorno parseResponse(char *rawResponse, Response *response)
     response->body = strndup(line, contentLength);
     if (strlen(line) < contentLength)
         return ReadMore;
+
     return ParseError_NONE;
 }
 
@@ -311,5 +322,6 @@ StringfyErrorno stringfyResponse(const Response *response, char *destStr, size_t
 
     strcat(destStr, "\r\n");
     strcat(destStr, response->body);
+
     return StringfyError_NONE;
 }

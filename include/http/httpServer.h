@@ -12,7 +12,7 @@
 #ifndef __HTTPSERVER_H__
 #define __HTTPSERVER_H__
 
-#include "http/httpMessage.h"
+#include <http/httpMessage.h>
 
 /**
  * @brief  define handler type
@@ -24,19 +24,19 @@ typedef void (*Handler)(Request *request, Response *response);
  * @brief define URI tree
  *
  */
-typedef struct _PathNode
+typedef struct PathNode
 {
     const char *dir;
     Handler handlers[NUMSUPPORTEDMETHOD];
-    PathNode *child;
-    PathNode *next;
+    struct PathNode *child;
+    struct PathNode *next;
 } PathNode;
 
 /**
  * @brief define server. server hold port, server socket fd and Path
  *
  */
-typedef struct _server
+typedef struct
 {
     int port;
     int fd;
