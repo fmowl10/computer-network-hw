@@ -13,13 +13,12 @@
 #define __HTTPMESSAGE_H__
 
 #include <stdbool.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 /**
- * @brief errorno
+ * @brief parse error numbers
  *
  */
-
 typedef enum
 {
     ParseError_NONE = 0,
@@ -169,6 +168,13 @@ typedef struct
 Request *newRequest();
 
 /**
+ * @brief free request
+ *
+ * @param request
+ */
+void freeRequest(Request *request);
+
+/**
  * @brief parse raw requset string to Request
  *
  * @param rawRequest in
@@ -205,6 +211,13 @@ typedef struct
  * @return Response*
  */
 Response *newResponse();
+
+/**
+ * @brief free response
+ *
+ * @param response
+ */
+void freeResponse(Response *response);
 
 /**
  * @brief parse raw reponse string to Response

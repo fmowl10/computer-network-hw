@@ -39,7 +39,7 @@ StatusCode parseStatusCode(int rawCode, const char *message)
 {
     for (int i = 0; i < NUMSUPPORTEDSTATUS; i++)
     {
-        if (RawStatusCodes[i] == rawCode && strcmp(StatusCodeMessages[i], message))
+        if (RawStatusCodes[i] == rawCode && strcmp(StatusCodeMessages[i], message) == 0)
         {
             return (StatusCode)i;
         }
@@ -62,7 +62,7 @@ bool isProtocolVersionValid(const char *rawProtocol)
 
 HeaderNode *newHeaderNode(const char *key, const char *value)
 {
-    HeaderNode *temp = malloc(sizeof(HeaderNode));
+    HeaderNode *temp = (HeaderNode *)malloc(sizeof(HeaderNode));
     temp->next = NULL;
     temp->key = strdup(key);
     temp->value = strdup(value);
@@ -90,8 +90,11 @@ int addHeaderNode(HeaderNode **parent, HeaderNode *child)
 {
     if (child == NULL)
         return 1;
-    if (parent == NULL)
+    if (*parent == NULL)
+    {
         *parent = child;
+        return 0;
+    }
     HeaderNode *cur = *parent;
     while (cur->next != NULL)
     {
@@ -117,6 +120,9 @@ const char *getHeaderNodeItem(HeaderNode *root, const char *key)
 
 ParseErrorno parseHeaderNode(char **rawHeader, HeaderNode **hn)
 {
+    if (*rawHeader == NULL || rawHeader == NULL)
+        return ParseError;
+
     char *line = strtok(*rawHeader, "\r\n");
     char header[41] = {
         0,
@@ -126,7 +132,7 @@ ParseErrorno parseHeaderNode(char **rawHeader, HeaderNode **hn)
     };
     while (line != NULL)
     {
-        sscanf(line, "%40s: %100[a-zA-Z ]s", header, value);
+        sscanf(line, "%40[^:]: %100[^\r\n]s\r\n", header, value);
         if (addHeaderNode(hn, newHeaderNode(header, value)) == 1)
             return ParseError;
 
@@ -158,7 +164,13 @@ StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz)
         strcat(destStr, ": ");
         strcat(destStr, cur->value);
         strcat(destStr, "\r\n");
+
+        cur = cur->next;
     }
+    if (length + 2 > sz)
+        return TOO_SHORT;
+
+    strcat(destStr, "\r\n");
 
     return StringfyError_NONE;
 }
@@ -175,15 +187,37 @@ Request *newRequest()
     return temp;
 }
 
-ParseErrorno parseRequest(char *rawRequset, Request *request)
+void freeRequest(Request *requset)
 {
-    if (request == NULL || request == NULL)
+    if (requset == NULL)
+        return;
+
+    if (requset->body != NULL)
+        free(requset->body);
+
+    if (requset->protocol != NULL)
+        free(requset->protocol);
+
+    if (requset->URI != NULL)
+        free(requset->URI);
+
+    if (requset->header != NULL)
+        freeHeaderList(&(requset->header));
+
+    free(requset);
+
+    return;
+}
+
+ParseErrorno parseRequest(char *rawRequest, Request *request)
+{
+    if (request == NULL || rawRequest == NULL)
         return ParseError;
 
     char rawMethod[6] = {
         0,
     };
-    char rawProtocol[11] = {
+    char rawProtocol[9] = {
         0,
     };
 
@@ -191,10 +225,10 @@ ParseErrorno parseRequest(char *rawRequset, Request *request)
     char *line = NULL;
     request->URI = malloc(sizeof(char) * 201);
 
-    line = strtok(rawRequset, "\r\n");
+    line = strtok(rawRequest, "\r\n");
 
     // split
-    int valueCount = sscanf(line, "%5s %10s %201s",
+    int valueCount = sscanf(line, "%5s %201s %10s",
                             rawMethod, request->URI, rawProtocol);
     if (valueCount != 3)
         return ParseError;
@@ -210,17 +244,22 @@ ParseErrorno parseRequest(char *rawRequset, Request *request)
         return ParseError;
     request->protocol = strdup(rawProtocol);
 
+    line += strlen(line) + strlen("\r\n");
+
     if (parseHeaderNode(&line, &(request->header)) == ParseError)
         return ParseError;
 
     // 나머지 body 복사
-    int contentLength = atoi(getHeaderNodeItem(request->header, "Content-Length"));
-    if (contentLength == 0)
-        return ParseError_NONE;
+    if (getHeaderNodeItem(request->header, "Content-Length") != NULL)
+    {
+        int contentLength = atoi(getHeaderNodeItem(request->header, "Content-Length"));
+        if (contentLength == 0)
+            return ParseError_NONE;
 
-    request->body = strndup(line, contentLength);
-    if (strlen(line) < contentLength)
-        return ReadMore;
+        request->body = strndup(line, contentLength + 1);
+        if (strlen(line) < contentLength)
+            return ReadMore;
+    }
 
     return ParseError_NONE;
 }
@@ -238,12 +277,14 @@ StringfyErrorno stringfyRequest(const Request *request, char *destStr, size_t sz
     if (stringfyHeaderNode(request->header, destStr, sz) == TOO_SHORT)
         return TOO_SHORT;
 
-    len = strlen(destStr) + strlen(destStr) + strlen(request->body);
-    if (len + 1 > sz)
-        return TOO_SHORT;
+    if (request->body != NULL)
+    {
+        len = strlen(destStr) + strlen(request->body);
+        if (len + 1 > sz)
+            return TOO_SHORT;
 
-    strcat(destStr, "\r\n");
-    strcat(destStr, request->body);
+        strcat(destStr, request->body);
+    }
 
     return StringfyError_NONE;
 }
@@ -257,6 +298,25 @@ Response *newResponse()
     temp->body = NULL;
 
     return temp;
+}
+
+void freeResponse(Response *response)
+{
+    if (response == NULL)
+        return;
+
+    if (response->body != NULL)
+        free(response->body);
+
+    if (response->protocol != NULL)
+        free(response->protocol);
+
+    if (response->header != NULL)
+        freeHeaderList(&(response->header));
+
+    free(response);
+
+    return;
 }
 
 ParseErrorno parseResponse(char *rawResponse, Response *response)
@@ -287,16 +347,21 @@ ParseErrorno parseResponse(char *rawResponse, Response *response)
         return ParseError;
     response->protocol = strdup(rawProtocol);
 
+    line += strlen(line) + strlen("\r\n");
+
     if (parseHeaderNode(&line, &(response->header)) == ParseError)
         return ParseError;
 
-    int contentLength = atoi(getHeaderNodeItem(response->header, "Content-Length"));
-    if (contentLength == 0)
-        return ParseError_NONE;
-    response->body = strndup(line, contentLength);
-    if (strlen(line) < contentLength)
-        return ReadMore;
+    if (getHeaderNodeItem(response->header, "Content-Length") != NULL)
+    {
+        int contentLength = atoi(getHeaderNodeItem(response->header, "Content-Length"));
+        if (contentLength == 0)
+            return ParseError_NONE;
 
+        response->body = strndup(line, contentLength + 1);
+        if (strlen(line) < contentLength)
+            return ReadMore;
+    }
     return ParseError_NONE;
 }
 
@@ -316,12 +381,14 @@ StringfyErrorno stringfyResponse(const Response *response, char *destStr, size_t
     if (stringfyHeaderNode(response->header, destStr, sz) == TOO_SHORT)
         return TOO_SHORT;
 
-    len = strlen(destStr) + strlen("\r\n") + strlen(response->body);
-    if (len + 1 > sz)
-        return TOO_SHORT;
+    if (response->body != NULL)
+    {
+        len = strlen(destStr) + strlen(response->body);
+        if (len + 1 > sz)
+            return TOO_SHORT;
 
-    strcat(destStr, "\r\n");
-    strcat(destStr, response->body);
+        strcat(destStr, response->body);
+    }
 
     return StringfyError_NONE;
 }
