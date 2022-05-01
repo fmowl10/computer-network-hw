@@ -29,7 +29,7 @@ doc_target = custom_target(
     command: [doxygen, doxyfile], 
     input : [
         project_header_files, 
-        project_sources
+        project_sources, files(join_paths(meson.source_root(),'README.md'))
     ], 
     output : ['.'], install : false)
 
