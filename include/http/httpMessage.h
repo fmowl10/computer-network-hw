@@ -30,7 +30,7 @@ typedef enum
 typedef enum
 {
     StringfyError_NONE = 0,
-    TOO_SHORT,
+    SHORTBUFFER,
 } StringfyErrorno;
 
 /**

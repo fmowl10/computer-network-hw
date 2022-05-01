@@ -19,6 +19,8 @@ extern void test_stringfyHeaderNode(void);
 extern void test_parseRequest_get(void);
 extern void test_parseRequest_post(void);
 extern void test_stringfyRequest(void);
+extern void test_parseResponse(void);
+extern void test_stringfyResponse(void);
 
 
 /*=======Mock Management=====*/
@@ -82,14 +84,16 @@ int main(void)
   UnityBegin("test/TestHttpMessage.c");
   run_test(test_parseMethod, "test_parseMethod", 14);
   run_test(test_parseStatusCode, "test_parseStatusCode", 23);
-  run_test(test_isPorotocolVersValid, "test_isPorotocolVersValid", 33);
-  run_test(test_addHeaderNode, "test_addHeaderNode", 40);
-  run_test(test_getHeaderNodeItem, "test_getHeaderNodeItem", 50);
-  run_test(test_parseHeaderNode, "test_parseHeaderNode", 65);
-  run_test(test_stringfyHeaderNode, "test_stringfyHeaderNode", 87);
-  run_test(test_parseRequest_get, "test_parseRequest_get", 112);
-  run_test(test_parseRequest_post, "test_parseRequest_post", 130);
-  run_test(test_stringfyRequest, "test_stringfyRequest", 150);
+  run_test(test_isPorotocolVersValid, "test_isPorotocolVersValid", 34);
+  run_test(test_addHeaderNode, "test_addHeaderNode", 41);
+  run_test(test_getHeaderNodeItem, "test_getHeaderNodeItem", 51);
+  run_test(test_parseHeaderNode, "test_parseHeaderNode", 66);
+  run_test(test_stringfyHeaderNode, "test_stringfyHeaderNode", 89);
+  run_test(test_parseRequest_get, "test_parseRequest_get", 115);
+  run_test(test_parseRequest_post, "test_parseRequest_post", 135);
+  run_test(test_stringfyRequest, "test_stringfyRequest", 155);
+  run_test(test_parseResponse, "test_parseResponse", 192);
+  run_test(test_stringfyResponse, "test_stringfyResponse", 213);
 
   return UnityEnd();
 }

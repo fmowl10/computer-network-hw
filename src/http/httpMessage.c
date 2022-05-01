@@ -158,7 +158,7 @@ StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz)
         // length check
         length = strlen(destStr) + strlen(cur->key) + strlen(": ") + strlen(cur->value) + strlen("\r\n");
         if (length + 1 > sz)
-            return TOO_SHORT;
+            return SHORTBUFFER;
 
         strcat(destStr, cur->key);
         strcat(destStr, ": ");
@@ -168,7 +168,7 @@ StringfyErrorno stringfyHeaderNode(HeaderNode *root, char *destStr, size_t sz)
         cur = cur->next;
     }
     if (length + 2 > sz)
-        return TOO_SHORT;
+        return SHORTBUFFER;
 
     strcat(destStr, "\r\n");
 
@@ -269,19 +269,19 @@ StringfyErrorno stringfyRequest(const Request *request, char *destStr, size_t sz
     int len = snprintf(NULL, 0, "%s %s %s\r\n",
                        RawMethods[request->method], request->URI, request->protocol);
     if (len + 1 > sz) // with null
-        return TOO_SHORT;
+        return SHORTBUFFER;
 
     snprintf(destStr, sz, "%s %s %s\r\n",
              RawMethods[request->method], request->URI, request->protocol);
 
-    if (stringfyHeaderNode(request->header, destStr, sz) == TOO_SHORT)
-        return TOO_SHORT;
+    if (stringfyHeaderNode(request->header, destStr, sz) == SHORTBUFFER)
+        return SHORTBUFFER;
 
     if (request->body != NULL)
     {
         len = strlen(destStr) + strlen(request->body);
         if (len + 1 > sz)
-            return TOO_SHORT;
+            return SHORTBUFFER;
 
         strcat(destStr, request->body);
     }
@@ -335,7 +335,7 @@ ParseErrorno parseResponse(char *rawResponse, Response *response)
     line = strtok(rawResponse, "\r\n");
     int valueCount = sscanf(line, "%11s %3d %[a-zA-Z ]",
                             rawProtocol, &rawStatuscode, RawStatusCodeMessage);
-    if (valueCount != 0)
+    if (valueCount != 3)
         return ParseError;
 
     response->code = parseStatusCode(rawStatuscode, RawStatusCodeMessage);
@@ -372,20 +372,20 @@ StringfyErrorno stringfyResponse(const Response *response, char *destStr, size_t
                        RawStatusCodes[response->code],
                        StatusCodeMessages[response->code]);
     if (len + 1 > sz)
-        return TOO_SHORT;
+        return SHORTBUFFER;
 
     snprintf(destStr, sz, "%s %d %s\r\n", response->protocol,
              RawStatusCodes[response->code],
              StatusCodeMessages[response->code]);
 
-    if (stringfyHeaderNode(response->header, destStr, sz) == TOO_SHORT)
-        return TOO_SHORT;
+    if (stringfyHeaderNode(response->header, destStr, sz) == SHORTBUFFER)
+        return SHORTBUFFER;
 
     if (response->body != NULL)
     {
         len = strlen(destStr) + strlen(response->body);
         if (len + 1 > sz)
-            return TOO_SHORT;
+            return SHORTBUFFER;
 
         strcat(destStr, response->body);
     }
