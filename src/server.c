@@ -17,9 +17,9 @@
 #include <http/httpMessage.h>
 #include <http/httpServer.h>
 
-const char *helloGetBody = "body";
+const char *helloGetBody = "body\n";
 
-const char *helloFormat = "hello, %s";
+const char *helloFormat = "hello, %s\n";
 
 /**
  * @brief GET /hello
@@ -57,11 +57,11 @@ int helloPost(const Request *req, Response *res)
     res->code = OK;
     res->protocol = strdup(req->protocol);
 
-    // remove escape, plus 1
+    // remove escape, plus null and \n
     int bodyLength = strlen(helloFormat) + strlen(req->body) - 2 + 1;
     res->body = malloc(bodyLength);
 
-    memset(req->body, '\0', bodyLength);
+    memset(res->body, '\0', bodyLength);
     snprintf(res->body, bodyLength, helloFormat, req->body);
 
     char bodyLengthStr[10] = {

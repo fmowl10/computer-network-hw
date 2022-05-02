@@ -348,6 +348,7 @@ int startServer(Server *server)
                 {
                     close(i);
                     FD_CLR(i, &(server->readSet));
+                    printf("client exit\n");
                     continue;
                 }
                 req = newRequest();
@@ -385,6 +386,7 @@ int startServer(Server *server)
                     goto EXIT;
                 }
                 write(i, message, strlen(message));
+                printf("responsed\n");
                 freeRequest(req);
                 freeResponse(res);
                 req = NULL;

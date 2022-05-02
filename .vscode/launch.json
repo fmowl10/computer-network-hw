@@ -19,6 +19,25 @@
             "MIMode": "gdb",
         },
         {
+            "name": "client",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/builddir/client",
+            "args": [
+                "-h",
+                "http://fmowl.com:2000/hello",
+                "-m",
+                "POST",
+                "-d",
+                "hello"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+        },
+        {
             "name": "test",
             "type": "cppdbg",
             "request": "launch",
