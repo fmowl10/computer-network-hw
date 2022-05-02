@@ -62,14 +62,14 @@ int helloPost(const Request *req, Response *res)
     res->body = malloc(bodyLength);
 
     memset(req->body, '\0', bodyLength);
-    snprintf(res->body, helloFormat, req->body);
+    snprintf(res->body, bodyLength, helloFormat, req->body);
 
     char bodyLengthStr[10] = {
         0,
     };
-    sprintf(bodyLength, "%ld", strlen(res->body));
+    sprintf(bodyLengthStr, "%ld", strlen(res->body));
 
-    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
+    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLengthStr));
     return 0;
 }
 
@@ -138,6 +138,7 @@ int main(int argc, char **argv)
     // /hello
     addRoute(server, "/hello", GET, helloGet);
     addRoute(server, "/hello", HEAD, helloGet);
+    addRoute(server, "/hello", POST, helloPost);
 
     // /(root)
     addRoute(server, "/", GET, root);
