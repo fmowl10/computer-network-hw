@@ -19,6 +19,8 @@
 
 const char *helloGetBody = "body";
 
+const char *helloFormat = "hello, %s";
+
 /**
  * @brief GET /hello
  *
@@ -26,7 +28,7 @@ const char *helloGetBody = "body";
 int helloGet(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = strdup(ProtocolVersions[0]);
+    res->protocol = strdup(req->protocol);
 
     if (req->method == GET)
         res->body = strdup(helloGetBody);
@@ -41,6 +43,33 @@ int helloGet(const Request *req, Response *res)
 
     addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
 
+    return 0;
+}
+
+int helloPost(const Request *req, Response *res)
+{
+    if (strlen(req->body) == 0)
+    {
+        BadRequest_func(req, res);
+        return 0;
+    }
+
+    res->code = OK;
+    res->protocol = strdup(req->protocol);
+
+    // remove escape, plus 1
+    int bodyLength = strlen(helloFormat) + strlen(req->body) - 2 + 1;
+    res->body = malloc(bodyLength);
+
+    memset(req->body, '\0', bodyLength);
+    snprintf(res->body, helloFormat, req->body);
+
+    char bodyLengthStr[10] = {
+        0,
+    };
+    sprintf(bodyLength, "%ld", strlen(res->body));
+
+    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
     return 0;
 }
 
@@ -62,7 +91,7 @@ const char *rootBody = {
 int root(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = strdup(ProtocolVersions[0]);
+    res->protocol = strdup(req->protocol);
 
     // if method is get than add a body
     if (req->method == GET)
