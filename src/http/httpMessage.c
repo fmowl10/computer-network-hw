@@ -22,7 +22,7 @@ const char *StatusCodeMessages[NUMSUPPORTEDSTATUS] = {"OK", "Bad Request", "Not 
 
 const int RawStatusCodes[NUMSUPPORTEDSTATUS] = {200, 400, 404};
 
-const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL] = {"HTTP/1.0"};
+const char *ProtocolVersions[NUMSUPPORTEDPROTOCOL] = {"HTTP/1.0", "HTTP/1.1"};
 
 Method parseMethod(const char *rawMethod)
 {

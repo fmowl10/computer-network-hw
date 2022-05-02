@@ -12,13 +12,57 @@
 #ifndef __HTTPSERVER_H__
 #define __HTTPSERVER_H__
 
+#include <sys/select.h>
+
 #include <http/httpMessage.h>
+
+#define MAXCLIENT 1024
+
+// 16kB
+#define BUFLENGTH 65536
+
+extern char *defaultNotFound;
+extern char *defaultBadRequest;
 
 /**
  * @brief  define handler type
  *
  */
-typedef void (*Handler)(Request *request, Response *response);
+typedef int (*Handler)(const Request *request, Response *response);
+
+/**
+ * @brief split path without modify
+ *
+ */
+typedef struct PathSegNode
+{
+    const char *start;
+    int length;
+
+    struct PathSegNode *next;
+} PathSegNode;
+
+/**
+ * @brief allocate new PathSegNode
+ *
+ * @return PathSegNode*
+ */
+PathSegNode *newPathSegNode();
+
+/**
+ * @brief split path
+ *
+ * @param path
+ * @return PathSegNode*
+ */
+PathSegNode *parsePathSeg(const char *path);
+
+/**
+ * @brief free nodes
+ *
+ * @param node
+ */
+void freePathSegList(PathSegNode *node);
 
 /**
  * @brief define URI tree
@@ -26,11 +70,43 @@ typedef void (*Handler)(Request *request, Response *response);
  */
 typedef struct PathNode
 {
-    const char *dir;
+    char *dir;
     Handler handlers[NUMSUPPORTEDMETHOD];
     struct PathNode *child;
     struct PathNode *next;
 } PathNode;
+
+/**
+ * @brief allocate PathNode
+ *
+ * @return PathNode*
+ */
+PathNode *newPathNode();
+
+/**
+ * @brief add pathNode
+ *
+ * @param root
+ * @param path
+ * @return int
+ */
+int addPathNode(PathNode **root, const char *path);
+
+/**
+ * @brief Get the Path Node object
+ *
+ * @param root
+ * @param path
+ * @return PathNode*
+ */
+PathNode *getPathNode(PathNode *root, const char *path);
+
+/**
+ * @brief free pathNodes
+ *
+ * @param root
+ */
+void freePathNodeList(PathNode *root);
 
 /**
  * @brief define server. server hold port, server socket fd and Path
@@ -41,12 +117,8 @@ typedef struct
     int port;
     int fd;
     PathNode *node;
+    fd_set readSet;
 } Server;
-
-/**
- * @todo add defalult response
- *
- */
 
 /**
  * @brief set server address, bind socket, set select
@@ -57,12 +129,19 @@ typedef struct
 Server *newServer(int portNumber);
 
 /**
+ * @brief
+ *
+ * @param server
+ */
+void freeServer(Server *server);
+
+/**
  * @brief  run server loop
  *
  * @param server
  * @return int
  */
-int startServer(const Server *server); // add errono
+int startServer(Server *server); // add errono
 
 /**
  * @brief book path and handler
@@ -76,22 +155,13 @@ int startServer(const Server *server); // add errono
 int addRoute(Server *server, const char *path, Method method, Handler handler); // add errono
 
 /**
- * @brief parse path
- *
- * @param path
- * @param dir
- * @return int
- */
-int parsePath(const char *path, char *dir); // add errono
-
-/**
  * @brief call handler by request
  *
  * @param request
  * @param response
  * @return int
  */
-int route(const Request *request, Response *response); // route pass server information to response
+int route(const Server *server, const Request *request, Response *response); // route pass server information to response
 
 // default error handler for parse error, bad request, request a non-existen object
 
@@ -102,7 +172,7 @@ int route(const Request *request, Response *response); // route pass server info
  * @param response
  * @return int
  */
-int NotFound(Request *request, Response *response);
+int NotFound_func(const Request *request, Response *response);
 
 /**
  * @brief  handle several cases. path have whitespace
@@ -111,6 +181,6 @@ int NotFound(Request *request, Response *response);
  * @param response
  * @return int
  */
-int BadRequest(Request *request, Response *response);
+int BadRequest_func(const Request *request, Response *response);
 
 #endif

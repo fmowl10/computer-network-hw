@@ -1,14 +1,22 @@
 # computer-network-hw
 implement http server &amp; client with raw socket
 
+## Page_Index
+
+* [Dependencies](#Dependencies)
+* [Project Commands](#project-commands)
+* [main logic](#main-logic)
+* [References](#references)
+___
+
 
 
 ## Dependencies
 
 ### Build
 
-* gcc (11.2.0>=)
-* meson (0.59.2 >=)
+* gcc (>= 11.2.0)
+* meson (>= 0.59.2 )
 * ninja (1.10.2)
 * build-enssential
 * dot
@@ -21,26 +29,44 @@ implement http server &amp; client with raw socket
 * cmake
 * pdflatex
 
-## Building The server &amp; client
+___
+
+## Project Commands
+
+### Building The server &amp; client
 
 ``` bash
-meson build
-ninja -C build
+meson builddir
+ninja -C builddir
 ```
 
-## Run programs
+### Run programs
 
 ```bash
-(project root directory)/build/[server, client]
+(project root directory)/builddir/[server, client]
 ```
 
-## Test library
+### Test library
 
 ```bash
-ninja -C build
-meson test -C build
+meson test -C builddir
 ```
 
+### Valgrind
+
+```sh
+meson test -C build --wrap='valgrind --leak-check=full --error-limit=no --track-originas=yes' --versbose
+```
+
+### Create Document
+
+```sh
+meson compile docs -C builddir
+# create pdf 
+# file located in builddir/docs/latex/refman.pdf
+meson compile pdf -C builddir
+```
+___
 
 ## main logic
 
@@ -52,7 +78,8 @@ meson test -C build
 
 4. client request ~
 
-    1. accept client
+    1. accept 
+        1. accept client
 
     2. receive client http request message
 
@@ -69,6 +96,8 @@ meson test -C build
         6. send http response message to client
 
     3. close client
+        1. close
+___
 
 ## References
 

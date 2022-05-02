@@ -18,6 +18,7 @@ extern void test_parseHeaderNode(void);
 extern void test_stringfyHeaderNode(void);
 extern void test_parseRequest_get(void);
 extern void test_parseRequest_post(void);
+extern void test_parseRequest_post_array(void);
 extern void test_stringfyRequest(void);
 extern void test_parseResponse(void);
 extern void test_stringfyResponse(void);
@@ -91,9 +92,10 @@ int main(void)
   run_test(test_stringfyHeaderNode, "test_stringfyHeaderNode", 89);
   run_test(test_parseRequest_get, "test_parseRequest_get", 115);
   run_test(test_parseRequest_post, "test_parseRequest_post", 135);
-  run_test(test_stringfyRequest, "test_stringfyRequest", 155);
-  run_test(test_parseResponse, "test_parseResponse", 192);
-  run_test(test_stringfyResponse, "test_stringfyResponse", 213);
+  run_test(test_parseRequest_post_array, "test_parseRequest_post_array", 155);
+  run_test(test_stringfyRequest, "test_stringfyRequest", 174);
+  run_test(test_parseResponse, "test_parseResponse", 218);
+  run_test(test_stringfyResponse, "test_stringfyResponse", 239);
 
   return UnityEnd();
 }

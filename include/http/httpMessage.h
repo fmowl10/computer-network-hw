@@ -23,13 +23,13 @@ typedef enum
 {
     ParseError_NONE = 0,
     ParseError,
-    Stringfyerror,
     ReadMore,
 } ParseErrorno;
 
 typedef enum
 {
     StringfyError_NONE = 0,
+    Stringfyerror,
     SHORTBUFFER,
 } StringfyErrorno;
 
@@ -88,7 +88,7 @@ extern const int RawStatusCodes[NUMSUPPORTEDSTATUS];
 
 StatusCode parseStatusCode(int rawCode, const char *message);
 
-#define NUMSUPPORTEDPROTOCOL 1
+#define NUMSUPPORTEDPROTOCOL 2
 
 /**
  * @brief https raw string

@@ -34,7 +34,7 @@ void test_parseStatusCode(void)
 void test_isPorotocolVersValid(void)
 {
     TEST_ASSERT(isProtocolVersionValid("HTTP/1.0"));
-    TEST_ASSERT(!isProtocolVersionValid("HTTP/1.1"));
+    TEST_ASSERT(isProtocolVersionValid("HTTP/1.1"));
     TEST_ASSERT(!isProtocolVersionValid("HTTP/2.0"));
 }
 
@@ -152,10 +152,33 @@ void test_parseRequest_post(void)
     freeRequest(req);
 }
 
+void test_parseRequest_post_array(void)
+{
+    char httpMessage[] = "POST /hello HTTP/1.0\r\n"
+                         "Host: example.com\r\n"
+                         "User-Agent: curl/7.78.0\r\n"
+                         "Accept: */*\r\n"
+                         "Content-Length: 6\r\n\r\nhello\n";
+    char *httpMessageLine = httpMessage;
+    Request *req = newRequest();
+
+    TEST_ASSERT_EQUAL_INT32(ParseError_NONE, parseRequest(httpMessageLine, req));
+    TEST_ASSERT_EQUAL_INT32(POST, req->method);
+    TEST_ASSERT(isProtocolVersionValid(req->protocol));
+    TEST_ASSERT_EQUAL_STRING("example.com", getHeaderNodeItem(req->header, "Host"));
+    TEST_ASSERT_EQUAL_STRING("hello\n", req->body);
+
+    freeRequest(req);
+}
+
 void test_stringfyRequest(void)
 {
     char *httpMessageOut = malloc(76);
     memset(httpMessageOut, '\0', 76);
+
+    char httpMessageOutArray[80] = {
+        0,
+    };
 
     const char *expected = "GET / HTTP/1.0\r\n"
                            "Host: example.com\r\n"
@@ -177,6 +200,9 @@ void test_stringfyRequest(void)
 
     TEST_ASSERT_EQUAL_INT32(StringfyError_NONE,
                             stringfyRequest(req, httpMessageOut, 76));
+
+    TEST_ASSERT_EQUAL_INT32(StringfyError_NONE,
+                            stringfyRequest(req, httpMessageOutArray, 80));
 
     TEST_ASSERT_EQUAL_STRING(expected, httpMessageOut);
 
@@ -237,5 +263,6 @@ void test_stringfyResponse(void)
     TEST_ASSERT_EQUAL_STRING(expected, httpMessage);
 
     free(httpMessage);
+    free(shortBuffer);
     freeResponse(res);
 }

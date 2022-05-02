@@ -26,20 +26,20 @@ const char *helloGetBody = "body";
 int helloGet(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = ProtocolVersions[0];
+    res->protocol = strdup(ProtocolVersions[0]);
 
     if (req->method == GET)
-        res->body = helloGetBody;
+        res->body = strdup(helloGetBody);
 
-    res->header = newHeaderNode("Content-Type", "text/plain");
+    addHeaderNode(&(res->header), newHeaderNode("Content-Type", "text/plain"));
 
     char bodyLength[10] = {
         0,
     };
 
-    sprintf(bodyLength, "%s", helloGetBody);
+    sprintf(bodyLength, "%ld", strlen(helloGetBody));
 
-    addHeaderNode(res->header, newHeaderNode("Content-length", bodyLength));
+    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
 
     return 0;
 }
@@ -62,23 +62,23 @@ const char *rootBody = {
 int root(const Request *req, Response *res)
 {
     res->code = OK;
-    res->protocol = ProtocolVersions[0];
+    res->protocol = strdup(ProtocolVersions[0]);
 
     // if method is get than add a body
     if (req->method == GET)
     {
-        res->body = rootBody;
+        res->body = strdup(rootBody);
     }
 
-    res->header = newHeaderNode("Content-Type", "text/html");
+    addHeaderNode(&(res->header), newHeaderNode("Content-Type", "text/html"));
 
     char bodyLength[10] = {
         0,
     };
 
-    sprintf(bodyLength, "%s", rootBody);
+    sprintf(bodyLength, "%ld", strlen(rootBody));
 
-    addHeaderNode(res->header, newHeaderNode("Content-length", bodyLength));
+    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
 
     return 0;
 }
