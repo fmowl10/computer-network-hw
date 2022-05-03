@@ -9,8 +9,10 @@
  *
  */
 
+#include <arpa/inet.h>
 #include <ctype.h>
 #include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,7 +28,8 @@ int main(int argc, char **argv)
         0,
     };
     const char *uri = NULL;
-    const char *method = NULL;
+    const char *rawPort = "80";
+    const char *rawMethod = "GET";
     const char *data = NULL;
 
     if (argc == 1 || (argc - 1) % 2 == 1)
@@ -42,7 +45,7 @@ int main(int argc, char **argv)
         }
         else if (strncmp(argv[i], "-m", 2) == 0)
         {
-            method = argv[i + 1];
+            rawMethod = argv[i + 1];
         }
         else if (strncmp(argv[i], "-d", 2) == 0)
         {
@@ -57,8 +60,6 @@ int main(int argc, char **argv)
     char path[100] = {
         0,
     };
-    const char *port = NULL;
-    char *tempString = NULL;
 
     int count = sscanf(uri, "http://%[^/]%s", host, path);
     if (count == 0)
@@ -71,35 +72,141 @@ int main(int argc, char **argv)
         }
     }
 
+    if (strlen(path) == 0)
+    {
+        memset(path, '\0', 100);
+        strcpy(path, "/");
+    }
+
     // port parse
     strcpy(host, strtok(host, ":"));
-    port = strtok(NULL, ":");
-    if (port != NULL)
+    rawPort = strtok(NULL, ":");
+    if (rawPort != NULL)
     {
-        char *iterTempString = port;
+        const char *iterTempString = rawPort;
         while (isdigit(*iterTempString))
             iterTempString++;
 
         if (*iterTempString != '\0')
         {
-            printf("invalid port:%s\n", port);
+            printf("invalid port:%s\n", rawPort);
+            return EXIT_FAILURE;
+        }
+        if (atoi(rawPort) >= (1 << 16))
+        {
+            printf("invalid port:%s\n", rawPort);
             return EXIT_FAILURE;
         }
     }
-    else
+
+    Method method = parseMethod(rawMethod);
+
+    if (method == Method_NONE)
     {
-        port = "80";
+        printf("input method with in [GET, HEAD, POST, PUT]\n");
+        return EXIT_FAILURE;
     }
-    struct addrinfo hints;
-    struct addrinfo *servinfo;
+
+    if (method == POST || method == PUT)
+    {
+        if (data == NULL || strlen(data) == 0)
+        {
+            printf("input a data\n");
+            return EXIT_FAILURE;
+        }
+    }
+
+    struct addrinfo hints, *res;
+
     memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
-    getaddrinfo(host, port, &hints, &servinfo);
-    for (; servinfo != NULL; servinfo = servinfo->ai_next)
+    if (getaddrinfo(host, rawPort, &hints, &res) != 0)
     {
-        printf("%s\n", servinfo->ai_canonname);
+        printf("getaddrinfo error\n");
+        return EXIT_FAILURE;
     }
-    freeaddrinfo(servinfo);
+
+    int fd = socket(res->ai_family, res->ai_socktype, 0);
+
+    if (fd == -1)
+    {
+        printf("socket error\n");
+        return EXIT_FAILURE;
+    }
+
+    if (connect(fd, res->ai_addr, res->ai_addrlen) == -1)
+    {
+        printf("connect error\n");
+        return 0;
+    }
+
+    char buff[65536] = {
+        0,
+    };
+
+    Request *req = newRequest();
+    req->method = method;
+    req->protocol = strdup(ProtocolVersions[0]);
+    req->URI = strdup(path);
+
+    strcat(host, ":");
+    strcat(host, rawPort);
+
+    addHeaderNode(&(req->header), newHeaderNode("User-Agent", "client"));
+    addHeaderNode(&(req->header), newHeaderNode("Host", host));
+    addHeaderNode(&(req->header), newHeaderNode("Accept", "*/*"));
+
+    if (req->method == POST || req->method == PUT)
+    {
+        req->body = strdup(data);
+        addHeaderNode(&(req->header), newHeaderNode("Content-Type", "text/plain"));
+        char lengthStr[10] = {
+            0,
+        };
+        snprintf(lengthStr, 10, "%ld", strlen(req->body));
+        addHeaderNode((&req->header), newHeaderNode("Content-Length", lengthStr));
+    }
+
+    stringfyRequest(req, buff, 65536);
+    printf("%s\n", buff);
+
+    write(fd, buff, strlen(buff));
+
+    memset(buff, '\0', 65536);
+
+    read(fd, buff, 65536);
+
+    printf("raw response message\n%s", buff);
+
+    Response *response = newResponse();
+
+    parseResponse(buff, response);
+
+    printf("status : ");
+
+    StatusCode code = response->code;
+
+    switch (code)
+    {
+    case OK:
+        printf("\033[40m\033[32m%s\033[0m", StatusCodeMessages[code]);
+        break;
+    case NotFound:
+
+    case BadRequest:
+        printf("\033[40m\033[31m%s\033[0m", StatusCodeMessages[code]);
+        break;
+    default:
+        break;
+    }
+    printf("\n");
+    printf("body : %s\n", response->body);
+
+    close(fd);
+    freeRequest(req);
+    freeResponse(response);
+    freeaddrinfo(res);
+
     return EXIT_SUCCESS;
 }

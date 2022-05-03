@@ -25,7 +25,7 @@
             "program": "${workspaceFolder}/builddir/client",
             "args": [
                 "-h",
-                "http://fmowl.com:2000/hello",
+                "fmowl.com:2000/hello",
                 "-m",
                 "POST",
                 "-d",
