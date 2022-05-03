@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     };
     const char *uri = NULL;
     const char *rawPort = "80";
-    const char *rawMethod = "GET";
+    const char *rawMethod = NULL;
     const char *data = NULL;
 
     if (argc == 1 || (argc - 1) % 2 == 1)
@@ -50,6 +50,17 @@ int main(int argc, char **argv)
         else if (strncmp(argv[i], "-d", 2) == 0)
         {
             data = argv[i + 1];
+        }
+    }
+    if (rawMethod == NULL)
+    {
+        if (data == NULL || strlen(data) == 0)
+        {
+            rawMethod = "GET";
+        }
+        else
+        {
+            rawMethod = "POST";
         }
     }
     if (uri == NULL)
@@ -105,6 +116,15 @@ int main(int argc, char **argv)
     {
         printf("input method with in [GET, HEAD, POST, PUT]\n");
         return EXIT_FAILURE;
+    }
+
+    if (method == GET || method == HEAD)
+    {
+        if (strlen(data) != 0)
+        {
+            printf("do not pass data on %s\n", rawMethod);
+            return EXIT_FAILURE;
+        }
     }
 
     if (method == POST || method == PUT)
