@@ -16,7 +16,7 @@ ___
 ### Build
 
 * gcc (>= 11.2.0)
-* meson (>= 0.59.2 )
+* meson (>= 0.53.2 )
 * ninja (1.10.2)
 * build-enssential
 * dot
@@ -74,12 +74,21 @@ meson test -C build --wrap='valgrind --leak-check=full --error-limit=no --track-
 
 ### Create Document
 
+(until meson 0.55.0)
+```
+cd builddir
+ninja docs
+ninja pdf
+```
+
+(since meson 0.55.0)
 ```sh
 meson compile docs -C builddir
 # create pdf 
 # file located in builddir/docs/latex/refman.pdf
 meson compile pdf -C builddir
 ```
+
 ___
 
 ## main logic
