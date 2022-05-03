@@ -17,6 +17,8 @@
 #include <http/httpMessage.h>
 #include <http/httpServer.h>
 
+#define setHost(res) addHeaderNode(&(res->header), newHeaderNode("Server", "Server"));
+
 const char *helloGetBody = "body\n";
 
 const char *helloFormat = "hello, %s\n";
@@ -41,7 +43,9 @@ int helloGet(const Request *req, Response *res)
 
     sprintf(bodyLength, "%ld", strlen(helloGetBody));
 
-    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
+    addHeaderNode(&(res->header), newHeaderNode("Content-Length", bodyLength));
+
+    setHost(res);
 
     return 0;
 }
@@ -69,7 +73,10 @@ int helloPost(const Request *req, Response *res)
     };
     sprintf(bodyLengthStr, "%ld", strlen(res->body));
 
-    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLengthStr));
+    addHeaderNode(&(res->header), newHeaderNode("Content-Length", bodyLengthStr));
+    addHeaderNode(&(res->header), newHeaderNode("Content-Type", "text/plain"));
+
+    setHost(res);
     return 0;
 }
 
@@ -107,7 +114,9 @@ int root(const Request *req, Response *res)
 
     sprintf(bodyLength, "%ld", strlen(rootBody));
 
-    addHeaderNode(&(res->header), newHeaderNode("Content-length", bodyLength));
+    addHeaderNode(&(res->header), newHeaderNode("Content-Length", bodyLength));
+
+    setHost(res);
 
     return 0;
 }
