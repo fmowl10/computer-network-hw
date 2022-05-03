@@ -42,8 +42,22 @@ ninja -C builddir
 
 ### Run programs
 
+#### client
+
 ```bash
-(project root directory)/builddir/[server, client]
+# full
+(project root directory)/builddir/client -h [host] -m [method] -d [data]
+
+# post
+(project root directory)/builddir/client -h [host] -d [data]
+
+# get
+(project root directory)/builddir/client -h [host] 
+```
+
+### server
+```bash
+(project root directory)/builddir/server [portnumber]
 ```
 
 ### Test library
