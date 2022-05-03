@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 
     read(fd, buff, 65536);
 
-    printf("raw response message\n%s", buff);
+    printf("raw response message\n%s\n", buff);
 
     Response *response = newResponse();
 
