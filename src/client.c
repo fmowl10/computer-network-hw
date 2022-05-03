@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 
     if (method == GET || method == HEAD)
     {
-        if (strlen(data) != 0)
+        if (data == NULL || strlen(data) != 0)
         {
             printf("do not pass data on %s\n", rawMethod);
             return EXIT_FAILURE;
