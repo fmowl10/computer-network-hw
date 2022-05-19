@@ -17,6 +17,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "preLaunchTask": "Meson: Build server"
         },
         {
             "name": "client",
@@ -36,6 +37,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "preLaunchTask": "Meson: Build client"
         },
         {
             "name": "test",
@@ -48,6 +50,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
+            "preLaunchTask": "Meson: Build test/test_runners/${fileBasenameNoExtension}"
         },
     ]
 }
