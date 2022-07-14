@@ -14,8 +14,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <http/httpMessage.h>
-#include <http/httpServer.h>
+#include "http/httpMessage.h"
+#include "http/httpServer.h"
 
 #define setHost(res) addHeaderNode(&(res->header), newHeaderNode("Server", "Server"));
 

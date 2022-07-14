@@ -3,8 +3,8 @@
 /*=======Automagically Detected Files To Include=====*/
 #include "unity.h"
 #include <sys/socket.h>
-#include <http/httpMessage.h>
-#include <http/httpServer.h>
+#include "http/httpMessage.h"
+#include "http/httpServer.h"
 
 /*=======External Functions This Runner Calls=====*/
 extern void setUp(void);

@@ -20,8 +20,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <http/httpMessage.h>
-#include <http/httpServer.h>
+#include "http/httpMessage.h"
+#include "http/httpServer.h"
 
 char *defaultNotFound = "<html><body><h1>Not Found 404</h1></body></html>";
 char *defaultBadRequest = "<html><body><h1>Bad Request 400</h1></body></html>";

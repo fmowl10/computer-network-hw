@@ -1,7 +1,7 @@
 #include <sys/socket.h>
 
-#include <http/httpMessage.h>
-#include <http/httpServer.h>
+#include "http/httpMessage.h"
+#include "http/httpServer.h"
 
 #include <unity.h>
 
